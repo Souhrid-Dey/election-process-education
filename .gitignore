@@ -33,3 +33,9 @@ next-env.d.ts
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code — local AI assistant config, memory, and session logs
+.claude/
+
+# Hackathon internal docs — not for public repo
+Challenge Instructions.md
