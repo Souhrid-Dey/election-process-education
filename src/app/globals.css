@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Custom CSS variables ──────────────────────────────────── */
+:root {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+}
+
+/* TODO Phase 2: Add Google Fonts via next/font and bind to CSS vars */
+
+/* ── Base styles ───────────────────────────────────────────── */
+@layer base {
+  body {
+    @apply bg-white text-gray-900 antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold leading-tight;
+  }
+
+  /* Smooth scrolling for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ── Utility classes ───────────────────────────────────────── */
+@layer utilities {
+  /* TODO Phase 2: Add civic-themed utility classes */
+  .civic-gradient {
+    background: linear-gradient(135deg, #1B3A6B 0%, #B22234 100%);
+  }
+
+  /* Chat message streaming cursor */
+  .streaming-cursor::after {
+    content: "▋";
+    animation: blink 1s step-end infinite;
+    @apply text-blue-500;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+}
