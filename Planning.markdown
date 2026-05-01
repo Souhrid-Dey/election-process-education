@@ -41,21 +41,11 @@ Read this file at the start of every session. Edit here when scope or decisions 
 
 ---
 
-## ⚠️ Critical Open Decision — AI Backend
+## ✅ AI Backend Decision — Resolved
 
-The challenge explicitly instructs participants to:
-- Enable **Vertex AI** in Google Cloud Console
-- Generate a **Gemini API key**
+**Decision: Switch to Gemini API via Vertex AI.**
 
-**Current setup uses Claude (Anthropic SDK).** Decision needed:
-
-| Option | Tradeoff |
-|--------|----------|
-| **A: Switch to Gemini** | Strongest Google Services alignment; scores highest on that criterion; matches challenge intent |
-| **B: Keep Claude** | Already scaffolded; cover Google via Civic API + Maps; weaker on "Google AI" angle |
-| **C: Both** | Gemini for chat AI, keep Claude as fallback; complex but covers all bases |
-
-**→ Pending user decision. Do not start Phase 3 until this is resolved.**
+The Anthropic SDK scaffolding (`src/lib/anthropic.ts`) will be replaced with a Gemini client (`src/lib/gemini.ts`). The `@anthropic-ai/sdk` package will be removed from `package.json` and replaced with `@google/generative-ai` or `@google-cloud/vertexai`.
 
 ---
 
@@ -393,4 +383,5 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 | 2026-05-02 | All API keys server-side only | Security criterion |
 | 2026-05-02 | Single `main` branch | Challenge requirement |
 | 2026-05-02 | Gitignore: .claude/, Challenge Instructions.md, Webinar MoM.md | Don't expose internal files |
-| **2026-05-02** | **AI backend: TBD — Gemini vs Claude** | **Pending user decision** |
+| 2026-05-02 | AI backend: **Gemini via Vertex AI** | Challenge requires Gemini key; strongest Google Services signal |
+| 2026-05-02 | `GEMINI_HANDOFF_PROMPT.md` created and gitignored | AI context handoff doc — internal only |
