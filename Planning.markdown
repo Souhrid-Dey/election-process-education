@@ -1,7 +1,7 @@
 # Planning.markdown — Election Process Education
 
 **Authoritative source of truth for the build plan.**
-Edit this file to update scope, phase status, or architectural decisions. Do not derive the plan from code analysis — read this file first.
+Read this file at the start of every session. Edit here when scope or decisions change. Do not re-derive the plan from code analysis.
 
 ---
 
@@ -12,33 +12,96 @@ Edit this file to update scope, phase status, or architectural decisions. Do not
 | Project Name | Election Process Education |
 | Hackathon | PromptWars April 2026 — Challenge 2 |
 | Organizers | Hack2Skill & Google for Developers Community |
+| Format | Individual challenge, bi-weekly, India-based developers |
 | Repo | https://github.com/Souhrid-Dey/election-process-education |
-| Branch | `main` (single branch — challenge requirement) |
+| Branch | `main` only (single branch — challenge rule) |
 | Repo size limit | < 10 MB |
-| Use | Educational only, not production/commercial |
+| Use | Educational only, not for production or commercial purposes |
 
 ---
 
-## Evaluation Criteria (from Challenge Instructions)
+## Mandatory Submission Artifacts (all 3 required)
 
-Submissions are scored on:
-1. **Code Quality** — structure, readability, maintainability
-2. **Security** — safe practices, no exposed keys, no vulnerabilities
-3. **Efficiency** — optimal use of time and memory
-4. **Testing** — functionality can be validated and maintained
-5. **Accessibility** — inclusive, usable design for diverse users
-6. **Google Services** — effective and meaningful integration ← *key differentiator*
+1. **Deployed Project Link** — live app hosted on **Google Cloud Run** (not Vercel)
+2. **GitHub Repository Link** — public repo with README explicitly explaining election education alignment
+3. **LinkedIn Post URL** — must document: tool usage, thought process, prompt evolution, AI vs. human design; must tag @Google for Developers and @Hack2skill
+
+---
+
+## Evaluation Criteria
+
+| Criterion | Weight | Notes |
+|-----------|--------|-------|
+| Code Quality | High | Structure, readability, maintainability |
+| Security | High | No exposed keys, safe practices, no vulnerabilities |
+| Efficiency | Medium | Optimal resource use — time and memory |
+| Testing | Medium | Functionality can be validated and maintained |
+| Accessibility | Medium | Inclusive, usable for diverse users |
+| **Google Services** | **High** | Effective and meaningful integration — key differentiator |
+
+---
+
+## ⚠️ Critical Open Decision — AI Backend
+
+The challenge explicitly instructs participants to:
+- Enable **Vertex AI** in Google Cloud Console
+- Generate a **Gemini API key**
+
+**Current setup uses Claude (Anthropic SDK).** Decision needed:
+
+| Option | Tradeoff |
+|--------|----------|
+| **A: Switch to Gemini** | Strongest Google Services alignment; scores highest on that criterion; matches challenge intent |
+| **B: Keep Claude** | Already scaffolded; cover Google via Civic API + Maps; weaker on "Google AI" angle |
+| **C: Both** | Gemini for chat AI, keep Claude as fallback; complex but covers all bases |
+
+**→ Pending user decision. Do not start Phase 3 until this is resolved.**
+
+---
+
+## GCP Setup Checklist (user action required)
+
+- [ ] Claim GCP credits via Hack2Skill dashboard (valid 180 days)
+- [ ] Create a Google Cloud project — save the **Project ID**
+- [ ] Enable **Vertex AI API** in Google Cloud Console
+- [ ] Generate **Gemini API key** from Vertex AI
+- [ ] Enable **Civic Information API** in Google Cloud Console
+- [ ] Enable **Maps JavaScript API** in Google Cloud Console
+- [ ] Install **Docker Desktop** (required for Cloud Run deployment)
+- [ ] Download and authenticate **Google Anti-Gravity**
+
+---
+
+## Deployment: Google Cloud Run
+
+The project must be deployed to **Google Cloud Run** via the **Anti-Gravity** agent.
+
+### Process (to be done in Phase 7)
+1. Ensure `next.config.ts` has `output: "standalone"` ✅ (already set)
+2. Ensure `Dockerfile` is present ✅ (already created)
+3. Open Anti-Gravity, provide GCP Project ID
+4. Instruct Anti-Gravity to deploy using **Command Prompt** (not PowerShell — avoids execution policy errors)
+5. Anti-Gravity uses the Cloud Run MCP server to build the Docker image and deploy
+
+### Environment variables on Cloud Run
+Set these in Cloud Run console (not in code):
+- `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` (depending on AI decision above)
+- `GOOGLE_CIVIC_API_KEY`
+- `GOOGLE_MAPS_API_KEY`
+- `NEXT_PUBLIC_GOOGLE_MAPS_KEY`
+- `NEXT_PUBLIC_APP_URL` (your Cloud Run service URL)
+- `NODE_ENV=production`
 
 ---
 
 ## Core Design Principles
 
-- **Nonpartisan always** — The AI system prompt enforces a strict no-partisan-opinion rule. This is never weakened, regardless of user input.
-- **Server-side secrets** — All API keys (Anthropic, Google) live server-side only. Never exposed to the client bundle.
-- **Streaming first** — All AI responses stream token-by-token. No buffering.
-- **Prompt caching** — The large election knowledge base always carries `cache_control: ephemeral` to minimize Anthropic API costs.
-- **Google Services as a core feature** — Not bolted on. Google Civic Information API is the dynamic data backbone.
-- **Accessibility** — WCAG 2.1 AA target throughout. Not an afterthought.
+- **Nonpartisan always** — AI system prompt enforces strict no-partisan-opinion rule. Never weakened.
+- **Server-side secrets** — All API keys server-side only. Never in client bundle or git.
+- **Streaming first** — All AI responses stream token-by-token.
+- **Prompt caching** — Election knowledge base always carries `cache_control: ephemeral` (if using Claude) or equivalent.
+- **Google Services as a core feature** — Civic Information API is the dynamic data backbone, not an add-on.
+- **Accessibility** — WCAG 2.1 AA target throughout.
 
 ---
 
@@ -51,10 +114,11 @@ Submissions are scored on:
 | Framework | Next.js 15 App Router | Native streaming, server components, API routes |
 | Language | TypeScript (strict) | Type safety across all data boundaries |
 | Styling | Tailwind CSS | Rapid civic theming, no runtime CSS overhead |
-| AI | Anthropic SDK — `claude-opus-4-7` | Most capable; adaptive thinking for complex civic questions |
+| AI | **TBD — Gemini or Claude** | See open decision above |
 | Civic data | Google Civic Information API | Real voter registration, polling locations, election dates |
 | Mapping | Google Maps JavaScript API | Visualize polling locations by address |
-| Deployment | Vercel | Native Next.js support, edge streaming |
+| Deployment | **Google Cloud Run** (Docker) | Challenge requirement |
+| Deploy tool | Google Anti-Gravity (Cloud Run MCP) | Challenge requirement |
 
 ### Data Flow
 
@@ -71,19 +135,19 @@ User question
     │       → election dates, polling locations, registration deadlines
     │
     ├─► Build prompt:
-    │       system: ELECTION_SYSTEM_PROMPT (cache_control: ephemeral)
-    │             + ELECTION_KNOWLEDGE_BASE (cache_control: ephemeral)
-    │             + civic data from Google API (injected dynamically)
+    │       system: ELECTION_SYSTEM_PROMPT
+    │             + ELECTION_KNOWLEDGE_BASE
+    │             + civic data injected dynamically
     │       messages: conversation history
     │
     ▼
-    Anthropic SDK  (claude-opus-4-7, adaptive thinking, streaming)
+    Gemini API (Vertex AI) OR Anthropic SDK — streaming
     │
     ▼
 ReadableStream → client
     │
     ▼
-[Client] tokens appended to streaming message bubble
+[Client] tokens appended in real-time with streaming cursor
 ```
 
 ### File Structure
@@ -112,31 +176,36 @@ src/
       TopicCards.tsx
     voting/
       VotingSteps.tsx
+    map/
+      PollingLocationMap.tsx
     ui/
       Button.tsx
       Card.tsx
   lib/
-    anthropic.ts              ← SDK client, MODEL, MAX_TOKENS
+    ai.ts                     ← Unified AI client (Gemini or Claude — TBD)
     google-civic.ts           ← Google Civic Information API client
-    google-maps.ts            ← Maps helper (polling location rendering)
+    google-maps.ts            ← Maps helper
     election-data.ts          ← Static: TOPICS, VOTING_STEPS, TIMELINE_EVENTS
-    prompts.ts                ← ELECTION_SYSTEM_PROMPT, ELECTION_KNOWLEDGE_BASE, CONVERSATION_STARTERS
+    prompts.ts                ← System prompt, knowledge base, conversation starters
   types/
     index.ts                  ← All domain types and enums
 public/
   assets/
     project-banner.webp       ← Project image for README and OG
+Dockerfile                    ← Multi-stage Docker build for Cloud Run
+.dockerignore
 ```
 
 ### Google Services Integration Plan
 
-| Service | Integration Point | Why It Matters for Evaluation |
-|---------|------------------|-------------------------------|
-| **Civic Information API** | `/api/chat` route handler — injected into AI context when user provides address | Core dynamic feature — makes answers real and location-specific |
-| **Maps JavaScript API** | `PollingLocationMap` component on chat and timeline pages | Visual, practical civic tool |
-| **Google Fonts (Inter)** | `next/font/google` in `layout.tsx` | Performance-optimized font loading |
-| **Google Calendar API** | "Add to Calendar" button for election dates | User utility, demonstrates breadth of Google integration |
-| **Firebase Analytics** *(optional)* | App-level tracking for usage patterns | Monitoring and evaluation support |
+| Service | Integration Point | Evaluation Impact |
+|---------|------------------|-------------------|
+| **Gemini API (Vertex AI)** | Primary AI chat backend | Direct Google AI usage — strongest signal |
+| **Civic Information API** | `/api/chat` — injected into AI context per address | Core dynamic feature |
+| **Maps JavaScript API** | `PollingLocationMap` component | Visual civic utility |
+| **Google Fonts (Inter)** | `next/font/google` in `layout.tsx` | Performance-optimized |
+| **Google Calendar API** | "Add election to Calendar" button | User utility |
+| **Cloud Run** | Production deployment | Challenge requirement |
 
 ---
 
@@ -144,33 +213,26 @@ public/
 
 ### Phase 1 — Foundation ✅ Complete
 
-**Goal:** Runnable skeleton with all types, static data, and stub endpoints defined.
+All types, static data, AI prompt infrastructure, stub API endpoint, Tailwind config, and component skeletons committed and pushed to GitHub.
 
-**Deliverables — all done:**
-- `package.json`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.js`
-- `.env.example`, `.gitignore` (with `.claude/` and `Challenge Instructions.md` excluded)
-- `src/types/index.ts` — all domain types and enums
-- `src/lib/election-data.ts` — `TOPICS`, `VOTING_STEPS`, `SAMPLE_TIMELINE_EVENTS`
-- `src/lib/prompts.ts` — system prompt, knowledge base, conversation starters
-- `src/lib/anthropic.ts` — SDK client
-- `src/app/api/chat/route.ts` — stub POST endpoint
-- `src/app/globals.css`, `layout.tsx`, `page.tsx`
-- All component skeletons: `ChatInterface`, `ChatMessage`, `ChatInput`, `ElectionTimeline`, `TopicCards`, `Button`, `Card`
-- `CLAUDE.md`, `README.md`, `Planning.markdown`, `Instruction.md`
-- Git initialized, connected to GitHub, pushed
+Key decisions made:
+- Next.js 15 App Router (streaming support)
+- `output: "standalone"` in next.config.ts (Cloud Run compatibility)
+- Dockerfile + .dockerignore created
+- `.gitignore` excludes `.claude/`, `Challenge Instructions.md`, `Webinar MoM.md`
 
 ---
 
 ### Phase 2 — UI Shell ⬜ Pending
 
-**Goal:** Polished, navigable UI. No real AI or Google APIs yet.
+**Goal:** Polished, navigable UI with proper components. No real AI or Google APIs yet.
 
 **Tasks:**
 - [ ] Install Inter via `next/font/google`, bind to CSS variables
 - [ ] Build `<Header />` with nav (Home | How to Vote | Timeline | Ask a Question)
-- [ ] Build `<Footer />` with links to vote.gov, usa.gov, and hackathon attribution
+- [ ] Build `<Footer />` with links to vote.gov, usa.gov, hackathon attribution
 - [ ] Replace inline topic cards on home page with `<TopicCards />` component
-- [ ] Add `/chat` page with `<ChatInterface />` layout (no real calls yet)
+- [ ] Add `/chat` page with `<ChatInterface />` layout (placeholder)
 - [ ] Wire topic card clicks → `/chat?topic=<id>`
 - [ ] Add "How It Works" 3-step section on home page
 - [ ] Add accessibility skip-to-content link
@@ -186,22 +248,23 @@ public/
 
 ### Phase 3 — AI Chat (Streaming) ⬜ Pending
 
-**Goal:** Real streaming chat with Claude. Prompt caching active.
+**Blocked by: AI backend decision (Gemini vs Claude)**
+
+**Goal:** Real streaming chat. Prompt caching active.
 
 **Tasks:**
-- [ ] Implement `POST /api/chat` with Anthropic SDK
-  - `claude-opus-4-7` + `thinking: { type: "adaptive" }`
-  - `cache_control: ephemeral` on system prompt + knowledge base
+- [ ] Implement `POST /api/chat` with chosen AI SDK (Gemini or Anthropic)
+  - Adaptive/extended thinking enabled
+  - Knowledge base cached if using Claude (`cache_control: ephemeral`)
   - Return `ReadableStream` of text chunks
 - [ ] Wire `<ChatInterface />` to consume the stream
-  - `useState` for messages array
+  - `useState` for messages
   - Streaming cursor while `isStreaming=true`
-  - Auto-scroll to bottom on new tokens
+  - Auto-scroll to bottom
 - [ ] Wire `<ChatInput />` — submit, clear, Enter key, Shift+Enter newline
 - [ ] Multi-turn conversation history in request body
-- [ ] Input validation (empty, too long)
-- [ ] Error handling (API key missing, rate limit, network failure)
-- [ ] Show `CONVERSATION_STARTERS` chips on empty chat state
+- [ ] Input validation + error handling
+- [ ] Show `CONVERSATION_STARTERS` chips on empty state
 - [ ] Pre-seed question from `?topic=<id>` URL param
 
 **API contract:**
@@ -212,35 +275,24 @@ Stream: raw text tokens (Content-Type: text/plain)
 Error:  { error: string } (JSON, non-200)
 ```
 
-**Prompt structure:**
-```
-system[0]: ELECTION_SYSTEM_PROMPT        { cache_control: ephemeral }
-system[1]: ELECTION_KNOWLEDGE_BASE       { cache_control: ephemeral }
-system[2]: civic_api_context (dynamic)   { no cache — varies per request }
-messages:  conversation history
-```
-
 ---
 
 ### Phase 4 — Google Services Integration ⬜ Pending
 
-**Goal:** Make the assistant data-driven with real civic information.
+**Goal:** Real civic data from Google APIs.
 
 **Tasks:**
 - [ ] Create `src/lib/google-civic.ts`
-  - `getVoterInfo(address)` → registration deadlines, polling locations, ballot info
-  - `getRepresentatives(address)` → elected officials at all levels
+  - `getVoterInfo(address)` → registration deadlines, polling locations
+  - `getRepresentatives(address)` → elected officials
   - `getElections()` → upcoming elections list
-  - Typed responses matching domain types in `src/types/index.ts`
-- [ ] Inject Civic API response into chat context when address is present
+- [ ] Inject Civic API data into chat context when address is provided
 - [ ] Add address input to chat UI ("Enter your address for personalized info")
-- [ ] Build `<PollingLocationMap />` component (Google Maps JS API)
-  - Show nearest polling locations as map markers
+- [ ] Build `<PollingLocationMap />` (Google Maps JS API)
+  - Nearest polling locations as map markers
   - Address search + recenter
-- [ ] Add "Add to Calendar" button for election dates (Google Calendar API)
-  - Create event via Calendar API with polling location and registration deadline
-- [ ] Add Google Fonts (Inter) via `next/font/google`
-- [ ] Security: all Google API keys server-side; Maps client key restricted to domain
+- [ ] "Add to Calendar" button for election dates (Google Calendar API)
+- [ ] Security: all server-side keys restricted; Maps client key domain-restricted
 
 **New files:**
 - `src/lib/google-civic.ts`
@@ -251,15 +303,15 @@ messages:  conversation history
 
 ### Phase 5 — Rich Content ⬜ Pending
 
-**Goal:** Election timeline, voting steps guide, and richer topic exploration.
+**Goal:** Timeline, voting steps walkthrough, richer topic exploration.
 
 **Tasks:**
-- [ ] Build full `<ElectionTimeline />` with today-marker and color-coded event types
-- [ ] Add `/timeline` page — full presidential-cycle timeline
-- [ ] Build `<VotingSteps />` walkthrough using `VOTING_STEPS` data
-- [ ] Add `/how-to-vote` page — step-by-step voting guide
+- [ ] Full `<ElectionTimeline />` with today-marker and color-coded event types
+- [ ] `/timeline` page — full presidential-cycle timeline
+- [ ] `<VotingSteps />` walkthrough using `VOTING_STEPS` data
+- [ ] `/how-to-vote` page — step-by-step voting guide
 - [ ] Link timeline events to chat with pre-seeded questions
-- [ ] State-specific voter registration lookup (external link to vote.gov)
+- [ ] State-specific voter registration lookup via vote.gov
 
 **New files:**
 - `src/app/timeline/page.tsx`
@@ -270,36 +322,42 @@ messages:  conversation history
 
 ### Phase 6 — Polish & Accessibility ⬜ Pending
 
-**Goal:** Production-quality UX, full accessibility, and testing.
+**Goal:** Production-quality UX, full WCAG 2.1 AA, and testing.
 
 **Tasks:**
-- [ ] WCAG 2.1 AA audit — keyboard navigation, ARIA labels, color contrast ≥ 4.5:1
-- [ ] Animate topic cards (staggered fade-up on mount)
-- [ ] Animate chat messages (slide in from bottom)
+- [ ] WCAG 2.1 AA audit — keyboard nav, ARIA labels, color contrast ≥ 4.5:1
+- [ ] Animate topic cards (staggered fade-up)
+- [ ] Animate chat messages (slide in)
 - [ ] "Copy to clipboard" on assistant messages
-- [ ] Loading skeleton for chat interface
+- [ ] Loading skeletons for chat
 - [ ] `<ErrorBoundary />` around `<ChatInterface />`
 - [ ] Component tests for `ChatMessage`, `TopicCards`, `ElectionTimeline`
-- [ ] API route tests for `/api/chat` (mock Anthropic + Google APIs)
+- [ ] API route tests (mock AI + Google APIs)
 - [ ] `robots.txt`, `sitemap.xml`
 - [ ] OpenGraph image (`og:image` → `public/assets/project-banner.webp`)
 - [ ] Mobile UX pass — hamburger menu, touch targets
 
 ---
 
-### Phase 7 — Deploy ⬜ Pending
+### Phase 7 — Deploy to Google Cloud Run ⬜ Pending
 
-**Goal:** Live public deployment on Vercel.
+**Goal:** Live deployment via Anti-Gravity agent.
 
 **Tasks:**
-- [ ] Create Vercel project, link GitHub repo
-- [ ] Set environment variables: `ANTHROPIC_API_KEY`, `GOOGLE_CIVIC_API_KEY`, `GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_APP_URL`
-- [ ] Restrict Google Maps client key to Vercel domain
-- [ ] Test streaming on Vercel (Node.js runtime — not Edge, for SDK compatibility)
-- [ ] Verify < 10 MB repo size
-- [ ] Add rate limiting on `/api/chat` (Vercel KV or in-memory for hackathon)
-- [ ] Final `npm run build` + type-check pass
-- [ ] Verify single `main` branch (challenge requirement)
+- [ ] Verify `npm run build` passes locally with `output: "standalone"`
+- [ ] Test Docker build locally: `docker build -t election-education .`
+- [ ] Test Docker run locally: `docker run -p 8080:8080 --env-file .env.local election-education`
+- [ ] Open Anti-Gravity, authenticate with GCP
+- [ ] Provide GCP Project ID to Anti-Gravity agent
+- [ ] Instruct Anti-Gravity to deploy via **Command Prompt** (not PowerShell)
+- [ ] Set all environment variables in Cloud Run console
+- [ ] Verify streaming works on Cloud Run (Node.js runtime)
+- [ ] Confirm repo size < 10 MB
+- [ ] Confirm single `main` branch
+- [ ] Get deployed Cloud Run URL
+- [ ] Update `NEXT_PUBLIC_APP_URL` in Cloud Run env vars
+- [ ] Write LinkedIn post — tag @Google for Developers and @Hack2skill
+- [ ] Submit: deployed link + GitHub link + LinkedIn post URL
 
 ---
 
@@ -307,23 +365,20 @@ messages:  conversation history
 
 ```bash
 # .env.local (never committed)
-ANTHROPIC_API_KEY=           # Anthropic console — server-side only
-ANTHROPIC_MODEL=claude-opus-4-7   # optional override
-GOOGLE_CIVIC_API_KEY=        # Google Cloud Console — server-side only
-GOOGLE_MAPS_API_KEY=         # Google Cloud Console — server-side only
-NEXT_PUBLIC_GOOGLE_MAPS_KEY= # Restricted Maps key — safe to expose to client
+
+# AI — use Gemini OR Anthropic (pending decision)
+GEMINI_API_KEY=              # Vertex AI — Google Cloud Console
+ANTHROPIC_API_KEY=           # Anthropic Console (if using Claude)
+ANTHROPIC_MODEL=claude-opus-4-7
+
+# Google Services
+GOOGLE_CIVIC_API_KEY=        # Server-side only
+GOOGLE_MAPS_API_KEY=         # Server-side only
+NEXT_PUBLIC_GOOGLE_MAPS_KEY= # Client-safe, domain-restricted
+
+# App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
-
----
-
-## Open Questions (to resolve before Phase 2)
-
-- [ ] Which specific Google Services are required vs. optional for Challenge 2?
-- [ ] Is there a defined **persona** for Challenge 2 (e.g., first-time voter, election official)?
-- [ ] What is **Antigravity** (mentioned in challenge instructions)? Any constraints from it?
-- [ ] Should the app support any U.S. state specifically, or nationwide?
-- [ ] Is Firebase Analytics required, or is any Google Service sufficient?
 
 ---
 
@@ -331,9 +386,11 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 | Date | Decision | Reason |
 |------|----------|--------|
-| 2026-05-02 | Next.js App Router over Pages Router | Native streaming support |
-| 2026-05-02 | `claude-opus-4-7` + adaptive thinking | Most capable model; complex civic reasoning |
-| 2026-05-02 | Google Civic Information API as core feature | Satisfies "Google Services" criterion meaningfully |
-| 2026-05-02 | All API keys server-side only | Security criterion; never expose in client bundle |
+| 2026-05-02 | Next.js 15 App Router | Native streaming support |
+| 2026-05-02 | `output: "standalone"` in next.config.ts | Required for Docker/Cloud Run |
+| 2026-05-02 | Google Cloud Run (not Vercel) | Challenge requirement — confirmed from webinar |
+| 2026-05-02 | Anti-Gravity for deployment | Challenge requirement |
+| 2026-05-02 | All API keys server-side only | Security criterion |
 | 2026-05-02 | Single `main` branch | Challenge requirement |
-| 2026-05-02 | `.claude/` and `Challenge Instructions.md` gitignored | User instruction — don't expose internal Claude/hackathon files |
+| 2026-05-02 | Gitignore: .claude/, Challenge Instructions.md, Webinar MoM.md | Don't expose internal files |
+| **2026-05-02** | **AI backend: TBD — Gemini vs Claude** | **Pending user decision** |
