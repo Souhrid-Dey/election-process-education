@@ -4,7 +4,7 @@
 
 // Chat & AI
 
-export type MessageRole = "user" | "assistant";
+export type MessageRole = "user" | "assistant" | "widget";
 
 export interface ChatMessage {
   id: string;
@@ -13,6 +13,12 @@ export interface ChatMessage {
   timestamp: Date;
   /** Set to true while a streaming response is in progress */
   isStreaming?: boolean;
+  widgetData?: {
+    type: "civic-data";
+    electionData?: { name: string; date: string } | null;
+    mapLocations?: any[];
+    userLocation?: { lat: number; lng: number; address?: string } | null;
+  };
 }
 
 export interface ChatState {
