@@ -9,7 +9,12 @@
  */
 
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Election Process Education",
@@ -29,11 +34,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen flex flex-col">
-        {/* TODO Phase 2: Add <Header /> here */}
-        <main className="flex-1">{children}</main>
-        {/* TODO Phase 2: Add <Footer /> here */}
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-screen flex flex-col font-sans">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-[#B22234] focus:text-white font-bold">
+          Skip to main content
+        </a>
+        <Header />
+        <main id="main-content" className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );

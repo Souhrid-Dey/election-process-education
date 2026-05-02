@@ -23,6 +23,7 @@
  */
 
 import { TOPICS } from "@/lib/election-data";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -37,9 +38,9 @@ export default function HomePage() {
           Electoral College — get clear, nonpartisan answers powered by AI.
         </p>
         {/* TODO Phase 2: Replace with styled <Button /> component */}
-        <button className="bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-800 transition-colors">
+        <Link href="/chat" className="inline-block bg-[#B22234] text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-[#8c1b29] transition-colors">
           Ask a Question →
-        </button>
+        </Link>
       </section>
 
       {/* ── Topic Cards ───────────────────────────────────────── */}

@@ -17,23 +17,125 @@
 
 "use client";
 
+import { useState, useRef, useEffect } from "react";
+import type { ChatMessage as ChatMessageType } from "@/types";
+import { ChatMessage } from "./ChatMessage";
+import { ChatInput } from "./ChatInput";
+import { CONVERSATION_STARTERS } from "@/lib/prompts";
+
 export function ChatInterface() {
-  // TODO Phase 3: useState for messages, loading, error
-  // TODO Phase 3: useRef for scroll container
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSubmit = async (content: string) => {
+    const newUserMsg: ChatMessageType = {
+      id: Date.now().toString(),
+      role: "user",
+      content,
+      timestamp: new Date(),
+    };
+
+    const newAssistantMsg: ChatMessageType = {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content: "",
+      timestamp: new Date(),
+      isStreaming: true,
+    };
+
+    setMessages((prev) => [...prev, newUserMsg, newAssistantMsg]);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: [...messages, newUserMsg] }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      if (!response.body) throw new Error("No response body");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let assistantContent = "";
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          assistantContent += decoder.decode(value, { stream: true });
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === newAssistantMsg.id
+                ? { ...msg, content: assistantContent }
+                : msg
+            )
+          );
+        }
+      }
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === newAssistantMsg.id
+            ? { ...msg, isStreaming: false }
+            : msg
+        )
+      );
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === newAssistantMsg.id
+            ? { ...msg, content: "Sorry, I encountered an error. Please try again.", isStreaming: false }
+            : msg
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full border rounded-xl overflow-hidden bg-white">
-      {/* Message list */}
+    <div className="flex flex-col h-full border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <p className="text-center text-gray-400 text-sm py-8">
-          🚧 Chat not yet implemented — Phase 3
-        </p>
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center p-4">
+            <h2 className="text-xl font-semibold text-[#1B3A6B] mb-2">Welcome to ElectionEd</h2>
+            <p className="text-gray-600 mb-6 max-w-md">I can answer questions about the U.S. election process, voting methods, and registration.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full max-w-lg">
+              {CONVERSATION_STARTERS.slice(0, 4).map((starter, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSubmit(starter)}
+                  className="text-sm text-left p-3 border border-gray-200 rounded-lg hover:border-[#1B3A6B] hover:text-[#1B3A6B] transition-colors bg-gray-50 hover:bg-white"
+                >
+                  {starter}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)
+        )}
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input bar */}
-      <div className="border-t p-4">
-        <p className="text-gray-400 text-sm text-center">
-          Input coming in Phase 3
-        </p>
+      <div className="border-t p-4 bg-gray-50">
+        <ChatInput onSubmit={handleSubmit} disabled={isLoading} />
       </div>
     </div>
   );

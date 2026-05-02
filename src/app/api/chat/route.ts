@@ -13,22 +13,64 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getGeminiModel } from "@/lib/gemini";
+import { ELECTION_SYSTEM_PROMPT, ELECTION_KNOWLEDGE_BASE } from "@/lib/prompts";
 import type { ChatApiRequest, ChatApiError } from "@/types";
 
 export async function POST(req: NextRequest): Promise<Response> {
-  // TODO Phase 3: Remove this stub and implement real streaming
-  const body = (await req.json()) as ChatApiRequest;
+  try {
+    const body = (await req.json()) as ChatApiRequest;
 
-  if (!body.messages || body.messages.length === 0) {
+    if (!body.messages || body.messages.length === 0) {
+      return NextResponse.json<ChatApiError>(
+        { error: "No messages provided" },
+        { status: 400 }
+      );
+    }
+
+    const systemInstruction = `${ELECTION_SYSTEM_PROMPT}\n\n${ELECTION_KNOWLEDGE_BASE}`;
+    const model = getGeminiModel(systemInstruction);
+
+    // Format history for Gemini
+    const history = body.messages.slice(0, -1).map((msg) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+
+    const latestMessage = body.messages[body.messages.length - 1].content;
+
+    const chatSession = model.startChat({ history });
+
+    const result = await chatSession.sendMessageStream(latestMessage);
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            if (chunkText) {
+              controller.enqueue(new TextEncoder().encode(chunkText));
+            }
+          }
+          controller.close();
+        } catch (e) {
+          controller.error(e);
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        "Connection": "keep-alive",
+      },
+    });
+  } catch (error: any) {
+    console.error("Chat API Error:", error);
     return NextResponse.json<ChatApiError>(
-      { error: "No messages provided" },
-      { status: 400 }
+      { error: error.message || "Failed to generate response" },
+      { status: 500 }
     );
   }
-
-  // Stub response — replace with Anthropic streaming in Phase 3
-  return NextResponse.json({
-    message:
-      "🚧 Chat API is not yet implemented. See src/app/api/chat/route.ts for Phase 3 TODO items.",
-  });
 }
