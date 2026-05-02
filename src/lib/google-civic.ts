@@ -27,8 +27,8 @@ export async function getVoterInfo(address: string): Promise<CivicData | null> {
     url.searchParams.append("key", API_KEY);
     url.searchParams.append("address", address);
     // In production, you would omit electionId to get the next upcoming election,
-    // but for consistent testing we use the official test election (2000)
-    // url.searchParams.append("electionId", "2000");
+    // but for consistent testing and hackathon demonstrations we use the official test election (2000)
+    url.searchParams.append("electionId", "2000");
 
     const response = await fetch(url.toString());
     
