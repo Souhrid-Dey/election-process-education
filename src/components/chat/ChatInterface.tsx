@@ -47,7 +47,7 @@ export function ChatInterface() {
       if (res.ok) {
         const data = await res.json();
         
-        if (data.election) {
+        if (data && data.election) {
           setElectionData({
             name: data.election.name,
             date: data.election.electionDay
@@ -55,7 +55,7 @@ export function ChatInterface() {
         }
 
         const locations = [];
-        if (data.pollingLocations) {
+        if (data && data.pollingLocations) {
           locations.push(...data.pollingLocations.map((loc: any) => ({
             name: loc.address.locationName || "Polling Place",
             lat: loc.latitude,
@@ -63,7 +63,7 @@ export function ChatInterface() {
             address: `${loc.address.line1}, ${loc.address.city}, ${loc.address.state} ${loc.address.zip}`
           })));
         }
-        if (data.earlyVoteSites) {
+        if (data && data.earlyVoteSites) {
            locations.push(...data.earlyVoteSites.map((loc: any) => ({
             name: loc.address.locationName || "Early Voting Site",
             lat: loc.latitude,
