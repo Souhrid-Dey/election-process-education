@@ -200,9 +200,9 @@ See [Planning.markdown](./Planning.markdown) for the complete phase-wise plan.
 | Phase | Description | Status |
 |-------|-------------|--------|
 | 1 | Foundation — scaffold, types, static data, Docker | ✅ Complete |
-| 2 | UI Shell — navigation, home page, topic cards | ⬜ Pending |
-| 3 | AI Chat — streaming Gemini integration | ⬜ Pending |
-| 4 | Google Integration — Civic API, Maps, Calendar | ⬜ Pending |
+| 2 | UI Shell — navigation, home page, topic cards | ✅ Complete |
+| 3 | AI Chat — streaming Gemini integration | ✅ Complete |
+| 4 | Google Integration — Civic API, Maps, Calendar | ✅ Complete |
 | 5 | Rich Content — timeline, voting steps | ⬜ Pending |
 | 6 | Polish & Accessibility | ⬜ Pending |
 | 7 | Deploy — Google Cloud Run via Anti-Gravity | ⬜ Pending |

@@ -15,11 +15,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/gemini";
 import { ELECTION_SYSTEM_PROMPT, ELECTION_KNOWLEDGE_BASE } from "@/lib/prompts";
+import { getVoterInfo, formatCivicDataForPrompt } from "@/lib/google-civic";
 import type { ChatApiRequest, ChatApiError } from "@/types";
 
 export async function POST(req: NextRequest): Promise<Response> {
   try {
-    const body = (await req.json()) as ChatApiRequest;
+    const body = (await req.json()) as ChatApiRequest & { address?: string };
 
     if (!body.messages || body.messages.length === 0) {
       return NextResponse.json<ChatApiError>(
@@ -28,7 +29,13 @@ export async function POST(req: NextRequest): Promise<Response> {
       );
     }
 
-    const systemInstruction = `${ELECTION_SYSTEM_PROMPT}\n\n${ELECTION_KNOWLEDGE_BASE}`;
+    let civicContext = "";
+    if (body.address) {
+      const civicData = await getVoterInfo(body.address);
+      civicContext = "\n\n" + formatCivicDataForPrompt(civicData, body.address);
+    }
+
+    const systemInstruction = `${ELECTION_SYSTEM_PROMPT}\n\n${ELECTION_KNOWLEDGE_BASE}${civicContext}`;
     const model = getGeminiModel(systemInstruction);
 
     // Format history for Gemini

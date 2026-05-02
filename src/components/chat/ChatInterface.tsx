@@ -22,10 +22,15 @@ import type { ChatMessage as ChatMessageType } from "@/types";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { CONVERSATION_STARTERS } from "@/lib/prompts";
+import { PollingLocationMap } from "../map/PollingLocationMap";
+import { CalendarButton } from "../ui/CalendarButton";
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [address, setAddress] = useState("");
+  const [mapLocations, setMapLocations] = useState<any[]>([]);
+  const [electionData, setElectionData] = useState<{name: string, date: string} | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -34,7 +39,45 @@ export function ChatInterface() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, mapLocations, electionData]);
+
+  const handleFetchCivicData = async (userAddress: string) => {
+    try {
+      const res = await fetch(`/api/civic?address=${encodeURIComponent(userAddress)}`);
+      if (res.ok) {
+        const data = await res.json();
+        
+        if (data.election) {
+          setElectionData({
+            name: data.election.name,
+            date: data.election.electionDay
+          });
+        }
+
+        const locations = [];
+        if (data.pollingLocations) {
+          locations.push(...data.pollingLocations.map((loc: any) => ({
+            name: loc.address.locationName || "Polling Place",
+            lat: loc.latitude,
+            lng: loc.longitude,
+            address: `${loc.address.line1}, ${loc.address.city}, ${loc.address.state} ${loc.address.zip}`
+          })));
+        }
+        if (data.earlyVoteSites) {
+           locations.push(...data.earlyVoteSites.map((loc: any) => ({
+            name: loc.address.locationName || "Early Voting Site",
+            lat: loc.latitude,
+            lng: loc.longitude,
+            address: `${loc.address.line1}, ${loc.address.city}, ${loc.address.state} ${loc.address.zip}`
+          })));
+        }
+        // Filter out locations without lat/lng
+        setMapLocations(locations.filter(l => l.lat && l.lng));
+      }
+    } catch (e) {
+      console.error("Failed to fetch civic data", e);
+    }
+  };
 
   const handleSubmit = async (content: string) => {
     const newUserMsg: ChatMessageType = {
@@ -55,11 +98,15 @@ export function ChatInterface() {
     setMessages((prev) => [...prev, newUserMsg, newAssistantMsg]);
     setIsLoading(true);
 
+    if (address && mapLocations.length === 0 && !electionData) {
+      handleFetchCivicData(address);
+    }
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, newUserMsg] }),
+        body: JSON.stringify({ messages: [...messages, newUserMsg], address }),
       });
 
       if (!response.ok) {
@@ -131,10 +178,41 @@ export function ChatInterface() {
         ) : (
           messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)
         )}
+
+        {(mapLocations.length > 0 || electionData) && (
+          <div className="px-4 py-4 bg-gray-50 rounded-xl border border-gray-200 shadow-sm mt-4">
+            {electionData && (
+              <div className="mb-4">
+                <h3 className="font-semibold text-[#1B3A6B] text-lg">Upcoming Election Found</h3>
+                <p className="text-gray-700">{electionData.name} — {electionData.date}</p>
+                <CalendarButton title={electionData.name} date={electionData.date} />
+              </div>
+            )}
+            
+            {mapLocations.length > 0 && (
+              <>
+                <h3 className="font-semibold text-[#1B3A6B] mb-2">📍 Nearest Polling Locations</h3>
+                <PollingLocationMap locations={mapLocations} />
+              </>
+            )}
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="border-t p-4 bg-gray-50">
+      <div className="border-t p-4 bg-gray-50 flex flex-col gap-3">
+        <input 
+          type="text" 
+          value={address}
+          onChange={(e) => {
+            setAddress(e.target.value);
+            setMapLocations([]);
+            setElectionData(null);
+          }}
+          placeholder="Optional: Enter your full address for personalized info"
+          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]"
+        />
         <ChatInput onSubmit={handleSubmit} disabled={isLoading} />
       </div>
     </div>
