@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(claude-api)",
+      "Bash(gh --version)",
+      "Bash(git --version)",
+      "PowerShell(gh *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(git commit -m ' * and use message- \"chore: refine project structure — planning, README, security, Google\r   Services scope\")",
+      "Bash(git commit -m ' * and the message should be docs\\(planning\\): rewrite for Cloud Run deployment, Gemini AI, Anti-Gravity toolchain\")"
+    ]
+  }
+}

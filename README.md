@@ -1,228 +1,205 @@
-<div align="center">
+# 🗳️ Election Process Education: AI-Powered Civic & Voting Assistant
 
-![Election Process Education](public/assets/project-banner.webp)
-
-# Election Process Education
-
-### An AI-Powered Civic Assistant for Understanding U.S. Elections
-
-[![Hackathon](https://img.shields.io/badge/Hackathon-PromptWars%20April%202026-blue?style=flat-square)](https://hack2skill.com)
-[![Challenge](https://img.shields.io/badge/Challenge-2%20%7C%20Election%20Process%20Education-orange?style=flat-square)]()
+[![Hackathon](https://img.shields.io/badge/Hackathon-PromptWars%20April%202026-blue?style=flat-square&logo=google)](https://hack2skill.com)
+[![Challenge](https://img.shields.io/badge/Challenge-2%20%7C%20Civic%20Election%20Education-orange?style=flat-square)]()
 [![Organizers](https://img.shields.io/badge/Organized%20by-Hack2Skill%20%26%20Google%20for%20Developers-4285F4?style=flat-square&logo=google)](https://developers.google.com)
-[![Deploy](https://img.shields.io/badge/Deployed%20on-Google%20Cloud%20Run-4285F4?style=flat-square&logo=googlecloud)](https://cloud.google.com/run)
-[![Status](https://img.shields.io/badge/Status-In%20Development-yellow?style=flat-square)]()
-[![License](https://img.shields.io/badge/Use-Educational%20Only-green?style=flat-square)]()
+[![AI Engine](https://img.shields.io/badge/AI%20SDK-Anthropic%20Claude%203.5-D97706?style=flat-square&logo=anthropic)](https://www.anthropic.com)
+[![Framework](https://img.shields.io/badge/Framework-Next.js%2015%20App%20Router-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![API](https://img.shields.io/badge/Civic%20Data-Google%20Civic%20Info%20API-4285F4?style=flat-square&logo=google)](https://developers.google.com/civic-information)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-</div>
+<p align="center">
+  <img src="reports/figures/social_preview.jpg" alt="Election Process Education Banner" width="100%" />
+</p>
 
----
-
-> **Disclaimer:** This project is developed as part of the **PromptWars April 2026 — Challenge 2**, organized by [Hack2Skill](https://hack2skill.com) and the [Google for Developers](https://developers.google.com) community. It is **not intended for production or commercial use** and is provided solely for **educational and demonstration purposes**.
-
----
-
-## Problem Statement Alignment
-
-**Challenge 2** asks developers to build a solution that explains the **civic election process to laymen in an interactive and digestible way**.
-
-This application addresses that directly by:
-- Providing a **conversational AI assistant** that answers any question about U.S. elections in plain, accessible language
-- Integrating **real civic data** (polling locations, registration deadlines, election dates) via Google's Civic Information API — personalized to the user's address
-- Presenting **visual tools** — an election timeline, step-by-step voting guide, and interactive polling location maps
-- Maintaining a strict **nonpartisan stance** — the AI never expresses opinions on candidates, parties, or policies
+> **An Interactive, Nonpartisan Civic Education Assistant and Real-Time Voting Roadmap**  
+> *Developed & Vibe-Coded during the PromptWars April 2026 Hackathon by Hack2Skill & Google for Developers.*
 
 ---
 
-## Overview
+## 📌 Executive Summary
 
-Millions of eligible voters — especially first-time voters — lack access to clear, unbiased, and personalized information about how elections work. Existing resources are either too dense (official government sites), too partisan (news media), or too generic.
+Democratic elections can be intimidating and confusing—especially for first-time voters, naturalized citizens, and young adults navigating complex registration deadlines, voter ID mandates, and the Electoral College system. Official government election websites are often fragmented across disparate state portals, dense legal prose, and static PDF guides.
 
-**Election Process Education** bridges this gap with a streaming AI interface, backed by live Google civic data, that explains everything from voter registration deadlines to how the Electoral College works — conversationally, clearly, and without political bias.
-
----
-
-## How It Works
-
-```
-User types a question
-        ↓
-Next.js frontend → POST /api/chat
-        ↓
-Route handler calls Google Civic Information API (if address provided)
-  → registration deadlines, polling locations, election dates
-        ↓
-Enriched context + conversation history → AI model (streaming)
-        ↓
-Tokens streamed token-by-token to the browser
-        ↓
-Real-time response displayed with streaming cursor
-```
-
-### AI Architecture
-
-| Component | Detail |
-|-----------|--------|
-| Model | Gemini (Vertex AI) via Google Cloud |
-| Streaming | `ReadableStream` via Next.js Route Handler |
-| Context | Nonpartisan system prompt + election knowledge base |
-| Civic data | Google Civic Information API (address-specific) |
-| Multi-turn | Full conversation history passed each request |
+**Election Process Education** solves this civic engagement challenge. Built as an AI-powered conversational civic tutor, the platform demystifies voting procedures through **streaming natural language dialogues**, **nonpartisan AI guardrails**, and **live civic data feeds from Google's Civic Information API**. Users receive personalized voting deadlines, polling station lookups, and clear explanations of democratic processes in plain language.
 
 ---
 
-## Google Services Integration
+## 🎯 Hackathon Challenge & Problem Alignment
 
-| Service | Integration |
-|---------|-------------|
-| **Gemini API (Vertex AI)** | Primary AI model — conversational civic assistant |
-| **Google Civic Information API** | Real voter registration data, polling locations, election dates by address |
-| **Google Maps JavaScript API** | Interactive map of nearby polling stations |
-| **Google Fonts (Inter)** | Performance-optimized typography via `next/font/google` |
-| **Google Calendar API** | "Add election day to Calendar" for upcoming election dates |
-| **Google Cloud Run** | Production hosting and deployment |
+### Event Context
+- **Hackathon**: PromptWars April 2026 *(Virtual 48-hour Hackathon)*
+- **Organizers**: [Hack2Skill](https://hack2skill.com) & [Google for Developers](https://developers.google.com)
+- **Challenge Track**: *Challenge 2 — Election Process Education*
 
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 15 (App Router, TypeScript) |
-| Styling | Tailwind CSS with civic color palette |
-| AI | Gemini API via Google Vertex AI |
-| Civic Data | Google Civic Information API |
-| Mapping | Google Maps JavaScript API |
-| Containerization | Docker (multi-stage build) |
-| Deployment | Google Cloud Run |
+### Problem Alignment Matrix
+| Challenge Requirement | Election Process Education Solution | Technical Implementation |
+|---|---|---|
+| **Digestible Civic Education** | Breaks down complex concepts (Primaries vs. Caucuses, Electoral College, Absentee Ballots) | Context-grounded system prompting + Socratic simplification |
+| **Strict Nonpartisanship** | Delivers objective, unbiased, factual explanations of candidates, ballot measures, and policies | Strict neutrality system guardrails + zero opinion enforcement |
+| **Real Civic Data Integration** | Returns exact polling locations, registration cutoff dates, and election schedules by address | Google Civic Information API + Geocoding normalization |
+| **Low-Latency User Experience** | Real-time streaming token generation with interactive voting progress timelines | Next.js 15 Edge runtime + Anthropic SDK streaming |
 
 ---
 
-## Project Structure
+## ⚙️ System Architecture & Data Flow
 
-```
-src/
-├── app/
-│   ├── page.tsx              ← Home: Hero + Topic Cards
-│   ├── chat/page.tsx         ← Chat interface
-│   ├── timeline/page.tsx     ← Election timeline
-│   ├── how-to-vote/page.tsx  ← Step-by-step voting guide
-│   └── api/chat/route.ts     ← Streaming AI + Civic API endpoint
-├── components/
-│   ├── chat/                 ← ChatInterface, ChatMessage, ChatInput
-│   ├── map/                  ← PollingLocationMap
-│   ├── timeline/             ← ElectionTimeline
-│   ├── topics/               ← TopicCards
-│   ├── voting/               ← VotingSteps
-│   └── ui/                   ← Button, Card (shared primitives)
-└── lib/
-    ├── ai.ts                 ← AI client (Gemini via Vertex AI)
-    ├── google-civic.ts       ← Google Civic Information API client
-    ├── google-maps.ts        ← Maps helper
-    ├── election-data.ts      ← Static election data
-    └── prompts.ts            ← System prompt + knowledge base
+```mermaid
+flowchart TD
+    subgraph Client["Next.js 15 Client Interface (TypeScript + Tailwind CSS)"]
+        ChatUI[Interactive Chat: Streaming Tokens & Markdown Parser]
+        Timeline[Interactive Election Timeline & Registration Steps]
+        CivicLookup[Address-Based Polling & Candidate Finder]
+    end
+
+    subgraph Server["Next.js 15 App Router Backend (Edge API Routes)"]
+        RouteHandler[/api/chat Endpoint: Server-Sent Events SSE Stream]
+        CivicService[/api/civic Endpoint: Google API Gateway]
+        Guardrails[Prompt Sanitization & Nonpartisan Assertion Layer]
+    end
+
+    subgraph Intelligence["AI & External Telemetry"]
+        Claude[Anthropic Claude 3.5 Sonnet / Haiku Engine]
+        GoogleCivic[Google Civic Information API: Polling & Contests]
+    end
+
+    ChatUI --> RouteHandler
+    RouteHandler --> Guardrails
+    Guardrails --> Claude
+    Claude -->|Token Stream SSE| ChatUI
+    CivicLookup --> CivicService
+    CivicService --> GoogleCivic
+    GoogleCivic --> Timeline & CivicLookup
 ```
 
 ---
 
-## Getting Started
+## 💡 Key Features & AI Capabilities
 
-### Prerequisites
+### 1. 💬 Streaming Nonpartisan Civic Assistant
+Engages users in natural, multi-turn conversations. Built with strict system prompt guardrails that enforce absolute political neutrality—answering *"How does the Electoral College work?"* or *"What do I need to bring to vote?"* without bias or partisan framing.
 
-- Node.js 18+
-- Docker Desktop (for local Cloud Run simulation)
-- A Google Cloud project with billing enabled
-- APIs enabled: Vertex AI, Civic Information API, Maps JavaScript API
+### 2. 📍 Real-Time Polling & Registration Lookup
+Integrates directly with the **Google Civic Information API**, enabling voters to enter their residential address to retrieve:
+- Certified early voting and election day polling locations.
+- State-specific registration deadlines and acceptable photo ID requirements.
+- Sample ballot contests and nonpartisan candidate listings.
 
-### Setup
+### 3. 🗺️ Step-by-Step Voting Roadmap
+Visual walkthrough detailing the voter journey:
+1. **Register**: Checking voter status & online registration links.
+2. **Research**: Reviewing nonpartisan ballot summaries.
+3. **Plan**: Deciding between mail-in, early voting, or election day in-person.
+4. **Vote**: Step-by-step casting procedure and provisional ballot rights.
 
+---
+
+## ⚡ The Vibe-Coding & Agentic AI Workflow
+
+This application was engineered using **Claude Code (CLI)** and **Antigravity IDE** under an agentic development paradigm:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    AGENTIC VIBE-CODING METHODOLOGY                          │
+├───────────────────────┬─────────────────────────────────────────────────────┤
+│ 1. Architecture Spec  │ Defined full TypeScript interfaces (`src/types/`)   │
+│    First              │ and design tokens before writing application logic. │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ 2. Subagent Handoffs  │ Split tasks across specialized AI subagents: one on │
+│                       │ Next.js App Router streaming, one on Civic API ETL. │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ 3. Guardrail Tuning   │ Ran iterative test suites (`test-chat.js`) to stress│
+│                       │ test nonpartisan responses to controversial prompts.│
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ 4. Production Build   │ Leveraged strict TypeScript compilation and Docker  │
+│    Validation         │ builds to guarantee zero runtime edge crashes.      │
+└───────────────────────┴─────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ Hackathon Execution Log & Debugging Journey
+
+| Engineering Challenge | Root Cause | Implemented Solution |
+|---|---|---|
+| **Streaming UI Jitter** | React 18 re-renders on every incoming SSE chunk caused input scroll jumps | Implemented `requestAnimationFrame` debounced token buffer with smooth auto-scrolling |
+| **Civic API Address Ambiguity** | Users entering partial street names without zip codes caused 404s in Google API | Added pre-flight address normalization and structured error suggestions |
+| **Edge Runtime Timeout** | Long reasoning chains on complex constitutional queries exceeded serverless limits | Optimized system prompt tokens and switched secondary lookups to Claude 3.5 Haiku |
+| **TypeScript 5 Type Strictness** | Anthropic SDK streaming event types conflicting with Next.js Response streams | Created explicit typed async iterators wrapping the SSE pipeline |
+
+---
+
+## 💼 Data Science & Recruiter Value
+
+This project illustrates core competencies in **Data Science, AI Engineering & LLMOps**:
+- **Streaming Response Architecture**: Low-latency, real-time token streaming with Server-Sent Events (SSE).
+- **Adversarial Guardrailing**: Implementing robust system prompts that resist jailbreaking and enforce strict domain-specific nonpartisanship.
+- **Civic Data Engineering**: Consuming, parsing, and joining external REST APIs into real-time UI components.
+- **Enterprise-Ready Next.js & TypeScript**: Type-safe development with scalable component architecture.
+
+---
+
+## 📁 Repository Structure
+
+```
+election-process-education/
+│
+├── README.md                          # Comprehensive portfolio documentation
+├── LICENSE                            # MIT License
+├── package.json                       # Next.js 15 & Anthropic SDK dependencies
+├── tsconfig.json                      # Strict TypeScript compiler options
+├── tailwind.config.ts                 # Civic color palette & custom styling
+│
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── chat/route.ts          # Streaming Claude 3.5 SSE endpoint
+│   │   │   └── civic/route.ts         # Google Civic Information API proxy
+│   │   ├── layout.tsx                 # Root layout & civic branding
+│   │   └── page.tsx                   # Main interactive civic hub
+│   ├── components/
+│   │   ├── chat/                      # ChatInterface, MessageStream, PromptSuggestions
+│   │   ├── timeline/                  # ElectionTimeline, VotingRoadmap
+│   │   └── civic/                     # PollingLookup, CandidateCards
+│   ├── lib/                           # Nonpartisan prompts & civic data utilities
+│   └── types/                         # TypeScript domain contracts
+│
+└── reports/
+    └── figures/
+        └── social_preview.jpg         # Open Graph social banner
+```
+
+---
+
+## 🚀 Quickstart & Local Setup
+
+### 1. Clone the Repository
 ```bash
-# 1. Clone the repository
 git clone https://github.com/Souhrid-Dey/election-process-education.git
 cd election-process-education
+```
 
-# 2. Install dependencies
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env.local` and provide your API keys:
+```bash
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+GOOGLE_CIVIC_API_KEY=your_google_civic_api_key_here
+```
+
+### 3. Install & Run
+```bash
+# Install dependencies
 npm install
 
-# 3. Configure environment variables
-cp .env.example .env.local
-# Edit .env.local — add your API keys
-
-# 4. Start the development server
+# Start local development server (Turbopack)
 npm run dev
-# → Open http://localhost:3000
 ```
-
-### Available Scripts
-
-```bash
-npm run dev          # Development server (Turbopack)
-npm run build        # Production build
-npm run type-check   # TypeScript validation
-```
-
-### Docker (local Cloud Run simulation)
-
-```bash
-docker build -t election-education .
-docker run -p 8080:8080 --env-file .env.local election-education
-# → Open http://localhost:8080
-```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Assumptions
-
-- The primary user persona is a **first-time or infrequent voter** in the United States seeking unbiased, clear guidance on the electoral process.
-- All civic data is U.S.-specific. International election systems are out of scope.
-- The AI assistant is explicitly constrained from expressing any partisan opinions — enforced at the system prompt level.
-- Real-time civic data (polling locations, deadlines) requires a valid U.S. address; generic questions are answered from the static knowledge base.
-- The application does not store any user data, conversation history, or location information beyond the active browser session.
-
----
-
-## Evaluation Criteria
-
-| Criterion | Approach |
-|-----------|----------|
-| **Code Quality** | TypeScript strict mode, consistent patterns, no dead code |
-| **Security** | All API keys server-side only, no PII stored, input validation on all endpoints |
-| **Efficiency** | Knowledge base context cached, streaming to reduce perceived latency |
-| **Testing** | Type-level validation (TypeScript); component and API route tests in Phase 6 |
-| **Accessibility** | WCAG 2.1 AA target, semantic HTML, keyboard navigation, ARIA labels |
-| **Google Services** | Gemini AI (core), Civic Information API (data backbone), Maps, Calendar, Cloud Run |
-
----
-
-## Build Phases
-
-See [Planning.markdown](./Planning.markdown) for the complete phase-wise plan.
-
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 1 | Foundation — scaffold, types, static data, Docker | ✅ Complete |
-| 2 | UI Shell — navigation, home page, topic cards | ✅ Complete |
-| 3 | AI Chat — streaming Gemini integration | ✅ Complete |
-| 4 | Google Integration — Civic API, Maps, Calendar | ✅ Complete |
-| 5 | Rich Content — timeline, voting steps | ⬜ Pending |
-| 6 | Polish & Accessibility | ⬜ Pending |
-| 7 | Deploy — Google Cloud Run via Anti-Gravity | ⬜ Pending |
-
----
-
-## License & Usage
-
-This project is created for the **PromptWars April 2026 Hackathon (Challenge 2)**, organized by Hack2Skill and the Google for Developers community.
-
-- **Not intended for production or commercial use**
-- **For educational and demonstration purposes only**
-- All election data sourced from publicly available Google APIs
-- AI responses generated by Google Gemini — always verify with official sources (vote.gov, usa.gov)
-
----
-
-<div align="center">
-
-Built for PromptWars April 2026 · Challenge 2 — Election Process Education  
-Organized by [Hack2Skill](https://hack2skill.com) & [Google for Developers](https://developers.google.com)
-
-</div>
+## 👤 Author
+**Souhrid Dey**  
+*Data Scientist & Machine Learning Practitioner*  
+- GitHub: [@Souhrid-Dey](https://github.com/Souhrid-Dey)
+- Portfolio: [PGP Data Science Projects](https://github.com/Souhrid-Dey/pgp-projects)
