@@ -142,7 +142,7 @@ This project illustrates core competencies in **Data Science, AI Engineering & L
 ## 📁 Repository Structure
 
 ```
-election-process-education/
+us-voter-education-ai-assistant/
 │
 ├── README.md                          # Comprehensive portfolio documentation
 ├── LICENSE                            # MIT License
@@ -175,8 +175,8 @@ election-process-education/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Souhrid-Dey/election-process-education.git
-cd election-process-education
+git clone https://github.com/Souhrid-Dey/us-voter-education-ai-assistant.git
+cd us-voter-education-ai-assistant
 ```
 
 ### 2. Configure Environment Variables
